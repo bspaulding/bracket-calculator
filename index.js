@@ -45,6 +45,7 @@ function calculateBracket() {
     round6Correct * 0;
 
   const upsets = [];
+  const picks = [];
   function upsetsInRound(round) {
     return Array.from(
       document.querySelectorAll(`.matchupRound${round + 1} .correctPick`)
@@ -63,8 +64,10 @@ function calculateBracket() {
         );
         const opponentId = opponent.getAttribute("data-id");
         const opponentSeed = seedById[opponentId];
+        const pick = { round, teamId, teamSeed, opponentId, opponentSeed };
+        picks.push(pick);
         if (teamSeed > opponentSeed) {
-          upsets.push({ round, teamId, teamSeed, opponentId, opponentSeed });
+          upsets.push(pick);
           // } else {
           // 	console.log('Snoozer', { teamId, teamSeed, opponentId, opponentSeed });
         }
@@ -78,7 +81,7 @@ function calculateBracket() {
 
   const totalDollars = totalPoints * 10 + upsetsPicked * 25;
   console.log("totalDollars: ", totalDollars);
-  return { totalPoints, upsetsPicked, upsets, totalDollars };
+  return { totalPoints, upsetsPicked, upsets, picks, totalDollars };
 }
 
 const getBracket = browser => async ({ name, url }) => {
@@ -95,6 +98,9 @@ const getBracket = browser => async ({ name, url }) => {
     return { name, error };
   }
 };
+
+const pickSummary = p =>
+  `${p.teamSeed} ${p.teamId} over ${p.opponentSeed} ${p.opponentId}`;
 
 function printUpsetReport(results) {
   const upsetTable = new Table({
@@ -184,9 +190,7 @@ function printUpsetReport(results) {
         const numPicked = pickersByUpsetId[upset.id].reduce(x => x + 1, -1);
         table.push([
           upset.round,
-          `${upset.teamSeed} ${upset.teamId} over ${upset.opponentSeed} ${
-            upset.opponentId
-          }`,
+          pickSummary(upset),
           numPicked === 0 ? "0! 😱🔮" : numPicked
         ]);
       });
@@ -204,6 +208,21 @@ function printScoreSummary(results) {
       result.results.upsetsPicked,
       result.results.totalPoints,
       `$${result.results.totalDollars}`
+    ]);
+  });
+  console.log(table.toString());
+}
+
+function printPickReport(results, picker) {
+  const { results: pickerResults } = results.find(r => r.name === picker);
+  const table = new Table({
+    head: ["Round", "Correct Pick", "Upset?"]
+  });
+  pickerResults.picks.forEach(pick => {
+    table.push([
+      pick.round,
+      pickSummary(pick),
+      pick.teamSeed > pick.opponentSeed ? "✅" : "😴"
     ]);
   });
   console.log(table.toString());
@@ -275,4 +294,5 @@ const getConfig = () => ({
 
   printScoreSummary(results);
   printUpsetReport(results);
+  printPickReport(results, "Bradley Spaulding");
 })();
