@@ -79,7 +79,9 @@ function calculateBracket() {
     0
   );
 
-  const totalDollars = totalPoints * 10 + upsetsPicked * 25;
+  const totalDollars =
+    totalPoints * process.env.DOLLARS_PER_POINT +
+    upsetsPicked * process.env.DOLLARS_PER_UPSET;
   console.log("totalDollars: ", totalDollars);
   return { totalPoints, upsetsPicked, upsets, picks, totalDollars };
 }
