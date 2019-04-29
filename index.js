@@ -37,12 +37,12 @@ function calculateBracket() {
   ).length;
 
   const totalPoints =
-    round1Correct * 1 +
-    round2Correct * 2 +
-    round3Correct * 3 +
-    round4Correct * 4 +
-    round5Correct * 5 +
-    round6Correct * 0;
+    round1Correct * process.env.POINTS_PER_PICK_ROUND_1 +
+    round2Correct * process.env.POINTS_PER_PICK_ROUND_2 +
+    round3Correct * process.env.POINTS_PER_PICK_ROUND_3 +
+    round4Correct * process.env.POINTS_PER_PICK_ROUND_4 +
+    round5Correct * process.env.POINTS_PER_PICK_ROUND_5 +
+    round6Correct * process.env.POINTS_PER_PICK_ROUND_6;
 
   const upsets = [];
   const picks = [];
